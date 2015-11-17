@@ -44,7 +44,7 @@
   }
 
   function createCanvas() {
-    canvas = document.createElement('canvas');
+    var canvas = document.createElement('canvas');
     canvas.id = "gestCanvas";
     canvas.style.width = document.body.scrollWidth;
     canvas.style.height = document.body.scrollHeight;
@@ -55,10 +55,18 @@
     canvas.style.overflow = 'visible';
     canvas.style.position = 'absolute';
     canvas.style.zIndex = "10000";
+    return canvas;
+  }
+
+  function clearAndRemoveCanvas() {
+    if (canvas) {
+      canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+      document.body.removeChild(canvas);
+    }
   }
 
   function draw(x, y) {
-    var ctx = document.getElementById('gestCanvas').getContext('2d');
+    var ctx = canvas.getContext('2d');
     ctx.beginPath();
     ctx.strokeStyle = myColor;
     ctx.lineWidth = myWidth;
@@ -151,9 +159,11 @@
           move += tmove;
           omove = tmove;
         }
-        if (!moved) {
+        if (!moved && trail) {
           // console.log('making canvas')
-          createCanvas();
+          if (!canvas) {
+            canvas = createCanvas();
+          }
           document.body.appendChild(canvas);
         }
         moved = true;
@@ -182,11 +192,7 @@
       // console.log('suppress is '+suppress)
       rmousedown = false;
       if (moved) {
-        var cvs = document.getElementById('gestCanvas');
-        if (cvs) {
-          // document.body.removeChild(link)
-          document.body.removeChild(canvas);
-        }
+        clearAndRemoveCanvas();
         exeFunc();
       } else if (rocked) {
         rocked = false;
@@ -219,9 +225,7 @@
         } else {
           chrome.extension.sendMessage({ msg: "newtab" },
             function(response) {
-              if (response) {
-                console.log(response.resp);
-              } else {
+              if (!response) {
                 console.log('problem executing open tab');
                 /** @namespace chrome.extension.lastError */
                 if (chrome.extension.lastError) {
