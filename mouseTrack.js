@@ -15,34 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.   
 */
 
-var rmousedown=false, moved=false, lmousedown=false
-var rocker=false, trail=false
-var mx,my,nx,ny,lx,ly,phi
-var move="", omove=""
-var pi =3.14159
-var suppress=1
-var canvas, myGests, ginv
-var link, ls, myColor="red", myWidth=3
-var loaded=false
-var rocked=false
-var link=null
+var rmousedown=false, moved=false, lmousedown=false;
+var rocker=false, trail=false;
+var mx,my,nx,ny,lx,ly,phi;
+var move="", omove="";
+var pi =3.14159;
+var suppress=1;
+var canvas, myGests, ginv;
+var myColor="red", myWidth=3;
+var loaded=false;
+var rocked=false;
+var link=null;
 
 function invertHash(hash)
 {
-    inv = {}
-    for(key in hash)
-        inv[hash[key]] = key
-    return inv
+    var inv = {};
+    for(var key in hash) {
+      if (hash.hasOwnProperty(key)) {
+        inv[hash[key]] = key;
+      }
+    }
+  return inv;
 }
 
 function createCanvas()
 {
     canvas = document.createElement('canvas');
-    canvas.id = "gestCanvas"
-    canvas.style.width=document.body.scrollWidth
-    canvas.style.height=document.body.scrollHeight
-    canvas.width=window.document.body.scrollWidth
-    canvas.height=window.document.body.scrollHeight     
+    canvas.id = "gestCanvas";
+    canvas.style.width=document.body.scrollWidth;
+    canvas.style.height=document.body.scrollHeight;
+    canvas.width=window.document.body.scrollWidth;
+    canvas.height=window.document.body.scrollHeight;
     canvas.style.left="0px";
     canvas.style.top="0px";
     canvas.style.overflow = 'visible';
@@ -52,12 +55,12 @@ function createCanvas()
 function draw(x,y){
     var ctx = document.getElementById('gestCanvas').getContext('2d');
     ctx.beginPath();
-    ctx.strokeStyle = myColor
-    ctx.lineWidth = myWidth
+    ctx.strokeStyle = myColor;
+    ctx.lineWidth = myWidth;
     ctx.moveTo(lx,ly);
     ctx.lineTo(x,y);
-    ctx.stroke()
-    lx=x
+    ctx.stroke();
+    lx=x;
     ly=y
 }
 
@@ -72,11 +75,11 @@ document.onmousedown = function(event){
     //leftrock
     if(event.which == 1 && rmousedown && suppress && rocker){
         if(! loaded){
-            loadOptions()
+            loadOptions();
             loaded=true
         }
-        move = 'back'
-        rocked = true
+        move = 'back';
+        rocked = true;
         // console.log(rocked)
         exeRock()
     }
@@ -85,27 +88,27 @@ document.onmousedown = function(event){
     //right mouse click
     else if(event.which == 3 && suppress){
         if(! loaded){
-            loadOptions()
+            loadOptions();
             loaded=true
         }
         if(lmousedown && rocker){
             if(! loaded){
-                loadOptions()
+                loadOptions();
                 loaded=true
             }
-            move = 'forward'
-            rocked = true
+            move = 'forward';
+            rocked = true;
             // console.log(rocked)
             exeRock()
         }
         else{
             my = event.pageX;
             mx = event.pageY;
-            lx = my
-            ly = mx
-            move = ""
-            omove=""
-            moved=false
+            lx = my;
+            ly = mx;
+            move = "";
+            omove="";
+            moved=false;
             if(event.target.href){
                 link = event.target.href
             }
@@ -127,39 +130,40 @@ document.onmousemove = function(event)
     {
         ny = event.pageX;
         nx = event.pageY;
-        var r = Math.sqrt(Math.pow(nx-mx,2)+Math.pow(ny-my,2))
+        var r = Math.sqrt(Math.pow(nx-mx,2)+Math.pow(ny-my,2));
         if(r > 16)
         {
-            phi = Math.atan2(ny-my,nx-mx)
-            if(phi < 0) phi += 2.*pi
+          var tmove;
+            phi = Math.atan2(ny-my,nx-mx);
+            if(phi < 0) phi += 2.*pi;
             if(phi >= pi/4. && phi < 3.*pi/4.)
-                var tmove="R"
+                tmove="R";
             else if(phi >= 3.*pi/4. && phi < 5.*pi/4.)
-                var tmove="U"
+                tmove="U";
             else if(phi >= 5.*pi/4. && phi < 7.*pi/4.)
-                var tmove="L"
+                tmove="L";
             else if(phi >= 7.*pi/4. || phi < pi/4.)
-                var tmove="D"
+                tmove="D";
             if(tmove != omove)
             {
-                move += tmove
+                move += tmove;
                 omove = tmove
             }
             if(moved == false)
             {
                 // console.log('making canvas')
-                createCanvas()
+                createCanvas();
                 document.body.appendChild(canvas);
             }
-            moved=true
-            console.log('indraw'+trail)
+            moved=true;
+            console.log('indraw'+trail);
 
             if(trail){
-                console.log('draw')
+                console.log('draw');
                 draw(ny,nx)
             }
 
-            mx = nx
+            mx = nx;
             my = ny
         }
     }
@@ -170,19 +174,18 @@ document.onmouseup = function(event)
 {
     // console.log('mouse is up '+suppress)
     if(event.which == 1)
-        lmousedown = false
+        lmousedown = false;
 
     //right mouse release
     if(event.which == 3){
         // console.log('suppress is '+suppress)
-        rmousedown=false
+        rmousedown=false;
         if(moved){
-            cvs = document.getElementById('gestCanvas')
+            var cvs = document.getElementById('gestCanvas');
             if(cvs)
             {
                 // document.body.removeChild(link)
-                document.body.removeChild(canvas)
-                cvs.width = cvs.width;
+                document.body.removeChild(canvas);
             }
             exeFunc()
         }
@@ -190,20 +193,19 @@ document.onmouseup = function(event)
             rocked = false
         }
         else{
-            --suppress
+            --suppress;
             // console.log('no move '+suppress)
-            $('#target').rmousedown(which=3);
+            //$('#target').rmousedown(which=3);
         }
     }
 };
 function exeRock()
 {
-    action = move
-    if(action == "back")
+    if(move == "back")
     {
         window.history.back()
     }
-    else if(action == "forward")
+    else if(move == "forward")
     {
         window.history.forward()
     }
@@ -214,7 +216,7 @@ function exeFunc()
     // console.log('exeFunc '+move)
     if(ginv[move])
     {
-        action = ginv[move]
+        var action = ginv[move];
         if(action == "back")
         {
             window.history.back()
@@ -226,14 +228,14 @@ function exeFunc()
         else if(action == "newtab")
         {
             if(link == null){
-                chrome.extension.sendMessage({msg: "newtab"}, 
+                chrome.extension.sendMessage({msg: "newtab"},
                     function(response)
                     {
                         if(response != null)
                             console.log(response.resp);
                         else
                         {
-                            console.log('problem executing open tab')
+                            console.log('problem executing open tab');
                             if(chrome.extension.lastError)
                                 console.log(chrome.extension.lastError.message)
                         }
@@ -270,14 +272,14 @@ function exeFunc()
         }
 
 
-        else if(action == "scrolltop") 
-            window.scrollTo(0,0)
+        else if(action == "scrolltop")
+            window.scrollTo(0,0);
 
-        else if(action == "scrollbottom") 
-            window.scrollTo(0,document.body.scrollHeight)
+        else if(action == "scrollbottom")
+            window.scrollTo(0,document.body.scrollHeight);
 
         else if(action == "reload")
-            window.location.reload()
+            window.location.reload();
 
         else if(action == "stop")
             window.stop()
@@ -290,15 +292,15 @@ document.oncontextmenu = function()
 {
     // console.log('ctx menu suppress is '+suppress)
     if(suppress)
-        return false
+        return false;
     else{
         // console.log("open it");
-        suppress++
+        suppress++;
         return true
     }
 };
 
-function loadOptions(name)
+function loadOptions()
 {
     chrome.extension.sendMessage({msg: "colorCode"}, 
         function(response) {
@@ -312,7 +314,7 @@ function loadOptions(name)
     chrome.extension.sendMessage({msg: "width"}, 
         function(response) {
             if(response){
-                myWidth = response.resp
+                myWidth = response.resp;
                 // console.log('width '+myWidth)
             }
             // else
@@ -322,7 +324,7 @@ function loadOptions(name)
         function(response) 
         {
             if(response)
-                myGests = response.resp
+                myGests = response.resp;
             ginv = invertHash(myGests)
         });
 
@@ -330,18 +332,16 @@ function loadOptions(name)
         function(response) 
         {
             if(response)
-                rocker = response.resp
-            if(rocker == 'true') rocker = true
-            else rocker = false
+                rocker = response.resp;
+            rocker = rocker == 'true';
         });
 
     chrome.extension.sendMessage({msg: "trail"}, 
         function(response) 
         {
             if(response)
-                trail = response.resp
-            if(trail == 'true') trail = true
-            else trail = false
+                trail = response.resp;
+            trail = trail == 'true';
         });
 }
 
